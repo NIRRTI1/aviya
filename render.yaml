@@ -11,5 +11,13 @@ services:
         value: llama3.2:1b
       - key: OLLAMA_URL
         value: http://localhost:11434
+      - key: OLLAMA_KEEP_ALIVE
+        value: 15m
+      - key: OLLAMA_TIMEOUT_SECONDS
+        value: 35
+      - key: OLLAMA_NUM_CTX
+        value: 2048
+      - key: OLLAMA_NUM_PREDICT
+        value: 180
       - key: CORS_ORIGINS
-        value: http://localhost:5173,http://127.0.0.1:5173
+        value: https://aviya-nirrti.vercel.app,https://aviya-five.vercel.app,https://aviya-git-main-nirrti.vercel.app,http://localhost:5173,http://127.0.0.1:5173
