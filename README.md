@@ -58,6 +58,10 @@ Sessions and uploaded materials are in process memory, not persisted. Restarting
 
 **Static frontend hosting alone does not provide FastAPI or Ollama.** A Vercel/GitHub Pages deployment (`cd frontend && npm run build`, output `frontend/dist`) works for topic quizzes using the WebLLM browser fallback; users need a compatible WebGPU browser and make a large first-run model download. To use the server model and upload documents, separately host FastAPI and an Ollama-compatible model service over HTTPS, set `VITE_API_URL` at frontend build time, and configure backend `CORS_ORIGINS` for the deployed frontend origin. Do not expose an unauthenticated Ollama endpoint directly to the public internet. The app is usable locally with API + Ollama without paid API keys.
 
+### Vercel + Render
+
+The repository includes `render.yaml` for the FastAPI service. In Render, create a Blueprint from this repository and select `render.yaml`; its service root is `backend`. Once deployed, set `CORS_ORIGINS` to include the exact Vercel HTTPS origin. In Vercel, import this repository and set Root Directory to `frontend`; Vite's build command and `dist` output are auto-detected. Set `VITE_API_URL` to the Render service URL before building. A standard Render web service does not include Ollama; without a separately provisioned Ollama runtime, the frontend automatically uses WebLLM for topic quizzes. The Render API's material upload endpoint requires Ollama to generate document-based questions.
+
 ## Contributing
 
 Issues and pull requests are welcome. Keep model inference on local/open-weight runtimes and avoid adding paid API dependencies. See [LICENSE](LICENSE).
