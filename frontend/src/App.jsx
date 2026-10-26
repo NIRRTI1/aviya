@@ -1,10 +1,11 @@
 import { useState } from 'react'
 import './style.css'
+import { browserRequest } from './webllm.js'
 const API = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 const roles = ['Curious expert','Senior Python Dev','History Scholar','MCAT Tutor','Product Strategist']
 export default function App(){
  const [topic,setTopic]=useState(''); const [role,setRole]=useState(roles[0]); const [material,setMaterial]=useState(null); const [session,setSession]=useState(null); const [answer,setAnswer]=useState(''); const [busy,setBusy]=useState(false); const [feedback,setFeedback]=useState(null); const [error,setError]=useState(''); const [mode,setMode]=useState('topic')
- async function request(path,body){const r=await fetch(`${API}${path}`,body instanceof FormData?{method:'POST',body}:{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});const d=await r.json();if(!r.ok)throw Error(d.detail||'Something went wrong');return d}
+ async function request(path,body){let r;try{r=await fetch(`${API}${path}`,body instanceof FormData?{method:'POST',body}:{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)})}catch{return browserRequest(path,body)}const d=await r.json();if(!r.ok)throw Error(d.detail||'Something went wrong');return d}
  async function upload(file){setError('');try{const f=new FormData();f.append('file',file);setMaterial(await request('/upload-material',f))}catch(e){setError(e.message)}}
  async function start(e){e?.preventDefault();if(!topic.trim())return;setBusy(true);setError('');try{setSession(await request('/start-quiz',{topic,role,material_id:material?.material_id}))}catch(e){setError(e.message)}finally{setBusy(false)}}
  async function submit(e){e.preventDefault();if(!answer.trim()||busy)return;setBusy(true);try{const d=await request('/submit-answer',{session_id:session.session_id,answer});setFeedback(d);setAnswer('');setSession(s=>({...s,question:d.next_question||s.question,difficulty:d.difficulty,answered:d.answered,average_score:d.average_score,done:d.done}))}catch(e){setError(e.message)}finally{setBusy(false)}}
